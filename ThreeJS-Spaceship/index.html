@@ -1,0 +1,267 @@
+<!DOCTYPE html >
+	<html lang="en">
+<head>
+
+	<link rel="stylesheet" href="animate.css">
+
+	<script src="three-min.js"></script>
+
+	<script src="stats.min.js"></script>
+
+
+	<title>3d Starfield</title>
+
+	<style>
+
+		body {
+
+			color: white;
+			font-family: Monospace;
+			font-size: 22px;
+			text-align: center;
+			font-weight: bold;
+			background-color: #000000;
+
+			overflow: scroll;
+
+		}
+
+		#info {
+
+			color: #000;
+			position: absolute;
+			top: 0px;
+			width: 100%;
+			padding: 5px;
+
+		}
+
+		a {
+
+			color: red;
+
+		}
+
+		hidden {
+
+			visibility: hidden;
+
+		}
+
+		visible {
+
+			visibility: visible;
+
+		}
+
+		.footer {
+
+			position: absolute;
+			bottom: 0;
+			width: 100%;
+			/* Set the fixed height of the footer here */
+			height: 60px;
+
+		}
+
+		#console {
+
+			width: 100%;
+			height: 300px;
+			padding-top: 0px;
+
+		}
+
+		#top {
+
+			width: 100%;
+			height: 50px;
+
+		}
+
+		.panel {
+
+			background-color: rgba(0, 0, 200, 0);
+			color: white;
+		}
+
+		input {
+			color: black;
+		}
+		div {
+
+			color:white;
+		}
+		#ship {
+
+			position: fixed;
+			z-index: 30;
+			margin-left: -1000px;
+			width: 100%;
+			height: 100%;
+
+		}
+
+	</style>
+</head>
+
+<body>
+
+
+	<img src="badassship.png" id="ship" class="img img-responsive" />
+	<div id="container"></div>
+
+<script>
+
+	var camera, controls, scene, renderer, stats;
+	var mouseX = 0, mouseY = 0;
+
+	windowHalfX = window.innerWidth / 2;
+	windowHalfY = window.innerHeight / 2;
+
+	init();
+	animate();
+	render();
+
+	function init() {
+
+		var container = document.getElementById('container');
+		var geometry = new THREE.SphereGeometry(1, 5, 1);
+		var material = new THREE.MeshBasicMaterial({
+
+			color: 0xffffff,
+			shading: THREE.FlatShading
+
+		});
+		group = new THREE.Group();
+
+
+		scene = new THREE.Scene();
+		scene.fog = new THREE.FogExp2(0x000000, 0.002);
+
+		renderer = new THREE.WebGLRenderer();
+		renderer.setClearColor(scene.fog.color);
+		renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.setSize(window.innerWidth, 2000);
+
+		camera = new THREE.PerspectiveCamera(120, window.innerWidth / window.innerHeight, 1, 700);
+		camera.position.z = 10;
+		camera.position.x = 10;
+		camera.position.y = 10;
+
+
+		// Enable these to play with the camera control settings.
+		//controls = new THREE.OrbitControls( camera, renderer.domElement );
+		//controls.addEventListener( 'change', render ); // add this only if there is no animation loop (requestAnimationFrame)
+		//controls.enableDamping = true;
+		//controls.dampingFactor = 0.25;
+		//controls.enableZoom = false;
+
+	    for (var i = 0; i < 44000; i++) {
+
+			var mesh = new THREE.Mesh(geometry, material);
+			mesh.position.x = (Math.random() - 0.5) * 3000;
+			mesh.position.y = (Math.random() - 0.5) * 3000;
+			mesh.position.z = (Math.random() - 0.5) * 3000;
+			mesh.updateMatrix();
+			mesh.matrixAutoUpdate = false;
+			group.add(mesh);
+
+		}
+
+		scene.add(group);
+
+
+
+		// lights
+
+		light = new THREE.DirectionalLight(0xffffff);
+		light.position.set(1, 1, 1);
+		scene.add(light);
+		light = new THREE.DirectionalLight(0x002288);
+		light.position.set(-1, -1, -1);
+		scene.add(light);
+		light = new THREE.AmbientLight(0x222222);
+		scene.add(light);
+
+		stats = new Stats();
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.top = '0px';
+		stats.domElement.style.zIndex = 0;
+		container.appendChild(stats.domElement);
+
+		window.addEventListener('resize', onWindowResize, false);
+
+		var stars = document.getElementById('stars');
+
+		document.body.appendChild(renderer.domElement);
+		document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+	}
+
+	function onDocumentMouseMove(event) {
+
+		mouseX = ( event.clientX - windowHalfX ) * 5;
+		mouseY = ( event.clientY - windowHalfY ) * 5;
+
+	}
+
+
+
+
+				function onWindowResize() {
+
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+
+
+
+					renderer.setSize(window.innerWidth, window.innerHeight);
+
+				}
+
+				function animate() {
+
+					requestAnimationFrame(animate);
+
+					//controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
+
+					stats.update();
+
+					render();
+
+				}
+				function onDocumentMouseMove(event) {
+
+								 mouseX = ( event.clientX - windowHalfX ) * 10;
+								 mouseY = ( event.clientY - windowHalfY ) * 10;
+
+							}
+
+s
+
+
+
+				function render() {
+
+					camera.position.z += -.09;//Enable this to change the way the camera interacts with the mouse
+					camera.position.y += (  mouseY - camera.position.y ) * 0.0002;//Disable this to disable mouse camera controls
+					camera.lookAt( scene.position );
+
+
+					var currentSeconds = Date.now();
+					//group.rotation.z = 10;
+
+					group.rotation.x = ( currentSeconds * 0.0003 ) * 0.4;//Adjust these two lines to change the default animations
+						//group.rotation.y = ( currentSeconds * 0.0003 ) * -0.4;
+					//group.rotation.z = Math.sin( currentSeconds * 0.0002 ) * 0.1;
+
+
+					renderer.render(scene, camera);
+				}
+
+				render();
+			</script>
+</body>
+
+</html>
